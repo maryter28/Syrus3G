@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        is-multidex="true"
+        jar="D:\Mary\Documents\Android Studio Projects\MARIA2\mysql-connector-java-3.0.17-ga-bin\mysql-connector-java-3.0.17-ga-bin.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.2"
+        sha1="3d8b493d12562fc904a947ea7b84394fe67e8a55">
+        <dex dex="D:\Mary\Documents\Android Studio Projects\MARIA2\app\build\intermediates\transforms\dex\debug\folders\1000\4\mysql-connector-java-3.0.17-ga-bin_6d49da258dce316f00fee53c0198b402a3e2ead7\classes.dex" />
+    </item>
+
+</items>
