@@ -1,0 +1,279 @@
+	
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+	<meta charset="utf-8">
+	<title>KER-Page</title>
+	<meta name="description" content="" />
+	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+	<link rel="stylesheet" href="estilos.css">
+
+	<script
+  src="https://code.jquery.com/jquery-3.2.1.js"
+  integrity="sha256-DZAnKJ/6XZ9si04Hgrsxu/8s717jcIzLy3oi35EouyE="
+  crossorigin="anonymous"></script>
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="docs/images/favicon.ico" />
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.4/dist/leaflet.css" integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA==" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.3.4/dist/leaflet.js" integrity="sha512-nMMmRyTVoLYqjP9hrbed9S+FzjZHW5gY1TWCHA5ckwXZBadntCNs8kEqAWdrb9O7rxbCaA4lKTIWjDXZxflOcA==" crossorigin=""></script>
+
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+	 crossorigin="anonymous"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+	 crossorigin="anonymous"></script>
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+	 crossorigin="anonymous">
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script>
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp"
+	 crossorigin="anonymous">
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.0-alpha14/js/tempusdominus-bootstrap-4.min.js"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.0-alpha14/css/tempusdominus-bootstrap-4.min.css" />
+
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    
+   	
+	<script type="text/javascript">
+
+		var popup = L.popup();
+
+		let posiciones = [];
+		function historicos() {
+			let fdate = document.getElementById('time').value;
+			let sdate = document.getElementById('time2').value;
+			let url = "historico.php";
+			$.ajax({
+				type: "post",
+				url: url,
+				data: { time: fdate, time2: sdate },
+				success: function (datos) {
+					$("#mostrar").html(datos);
+				}
+			});
+		}
+
+		function busqueda(dato){
+			posiciones = [];
+			let texto = dato.toString();
+			let latlng = texto.split(",");
+			let filas = document.getElementById("tablaHistoricos").rows.length - 1;
+			let i = 1;
+			while(i <= filas){
+				let lat = document.getElementById("lat" + i.toString()).innerHTML;
+				let long = document.getElementById("long" + i.toString()).innerHTML;
+				if(latlng[0] === lat && latlng[1] === long)	{
+					posiciones.push("Carro 0" + document.getElementById("carro"+i.toString()).innerHTML + ":-->" + document.getElementById("fecha"+i.toString()).innerHTML + "  Km/h: "+document.getElementById("rpm"+i.toString()).innerHTML);
+				}			
+				i++;
+			}
+
+			let resultados = "";
+			posiciones.forEach(element => {
+				resultados = resultados + element + ",  <br>";
+			});
+
+			popup.setLatLng(dato).setContent(resultados).openOn(mymap);
+
+		}
+	</script>
+
+</head>
+<body>
+	<div class="contenedor">
+		<header>
+			<div class="logo">
+				<img src="images/logo.jpg" width="150" alt="">
+				<a href="index.html">Posicionamiento Global</a>
+			</div>
+
+			<nav>
+				<a href="index.html">Inicio</a>
+				<a href="#">Blog</a>
+				<a href="#">Proyectos</a>
+				<a href="#">Contacto</a>
+			</nav>
+		</header>
+
+
+		<section class="main">
+			
+				<h2 class="titulo">Datos en Tiempo Real</h2>
+				<div id="Medidores02" style="float:right" ></div>
+				<div id="Medidores" style="float:right;" ></div>
+				<div id="TABLA"></div>
+				
+			
+
+		
+					<div id="pinicial"></div>
+
+					<div id="mapid" style="width: 100%; height:400px;"></div>
+					<input type="button" value="Centrar" class="btn btn-primary" style="margin: 0px 15px;" onclick="centrar();">
+					<input type="button" value="Street" class="btn btn-primary" style="margin: 0px 15px;" onclick="street();">
+					<input type="button" value="Satelite" class="btn btn-primary" style="margin: 0px 15px;" onclick="satelite();">
+
+
+					<script>	
+						var latlngH = [];
+						var latlngH2 = [];
+						var mymap = L.map('mapid').setView([11.010999, -74.828821], 13);
+						var H=[];
+
+						L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
+							maxZoom: 18,
+							id: 'mapbox.streets'
+						}).addTo(mymap);
+							
+							var distancia ;
+						    var circle ;
+						    circle();
+
+							function circle(){
+								circle = L.circle([11.009801, -74.828449], {radius: 1}).addTo(mymap);
+							}
+							
+							function onMapClick(e) {
+								
+								for (i = 0; i < H.length; i++) { 
+
+									distancia=e.latlng.distanceTo(H[i])
+									if(distancia < 200 ){
+										circle.setLatLng(H[i]).setRadius(distancia*1.1);
+										busqueda(H[i]);
+									}
+								}
+								circle.on('mouseout', function(){
+								circle.setRadius(2)	;
+							});
+							
+							}
+							mymap.on('mousemove', onMapClick);
+
+							setInterval(function(){
+							  var checkBox = document.getElementById("carro1");
+							  if (checkBox.checked == true){
+							    mostrarH();
+							  } else{
+							    polylineH.setLatLngs(p);
+							  }
+							  var checkBox2 = document.getElementById("carro2");
+							  if (checkBox2.checked == true){
+							    mostrarH2();
+							  } else {
+							    polylineH2.setLatLngs(p);
+							  }
+							},500);
+
+							google.charts.load('current', {'packages':['gauge']});
+						      setInterval(function() {
+							      google.charts.setOnLoadCallback(drawChart);
+						        }, 1000);
+						      function drawChart() {
+						        var data = google.visualization.arrayToDataTable([
+						          ['Label', 'Value'],
+						          ['Km/h-C01', Parametro],         
+						        ]);
+						        var options = {
+						          width: 200, height: 200,
+						          min: 0, max: 200,
+						          redFrom: 150, redTo: 200,
+						          yellowFrom:80, yellowTo: 150,
+						          minorTicks: 50
+						        };
+						        var chart = new google.visualization.Gauge(document.getElementById('Medidores'));
+						          chart.draw(data, options);
+
+						          var data2 = google.visualization.arrayToDataTable([
+						          ['Label', 'Value'],
+						          ['Km/h-C01', Parametro2],         
+						        ]);
+						        var options2 = {
+						          width: 200, height: 200,
+						          min: 0, max: 200,
+						          redFrom: 150, redTo: 200,
+						          yellowFrom:80, yellowTo: 150,
+						          minorTicks: 50
+						        };
+						        var chart2 = new google.visualization.Gauge(document.getElementById('Medidores2'));
+						          chart2.draw(data2, options2);
+
+
+						      }	
+
+
+					</script>
+					<script type="text/javascript" src="funciones.js"></script>
+
+					<div id="MAPA"></div>
+
+		</section>
+
+		<aside>
+			<h2 class="titulo">Historicos</h2><br>
+			<div class="widget">
+				<div class="imagen">
+					<div style="margin:0px 0px 100px 0px;">
+								<form method="POST">
+									<div class="container">
+										<div class='col-md-10'>
+											<div class="form-group">
+												<div class="input-group date" id="datetimepicker" data-target-input="nearest">
+													<input id="time" name="time" type="text" class="form-control datetimepicker-input" data-target="#datetimepicker" required/>
+													<div class="input-group-append" data-target="#datetimepicker" data-toggle="datetimepicker">
+														<div class="input-group-text"><i class="fa fa-calendar"></i></div>
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class='col-md-10'>
+											<div class="form-group">
+												<div class="input-group date" id="datetimepicker2" data-target-input="nearest">
+													<input id="time2" name="time2" type="text" class="form-control datetimepicker-input" data-target="#datetimepicker2" required/>
+													<div class="input-group-append" data-target="#datetimepicker2" data-toggle="datetimepicker">
+														<div class="input-group-text"><i class="fa fa-calendar"></i></div>
+													</div>
+												</div>
+											</div>
+										</div>
+										<input type="button" value="Filtrar" class="btn btn-primary" style="margin: 0px 15px; float: left;" onclick="historicos();">
+
+									</div>
+								</form>
+							</div>
+							<script type="text/javascript">
+								$(function () {
+									$('#datetimepicker').datetimepicker();
+									$('#datetimepicker2').datetimepicker({
+										useCurrent: false
+									});
+									$("#datetimepicker").on("change.datetimepicker", function (e) {
+										$('#datetimepicker2').datetimepicker('minDate', e.date);
+									});
+									$("#datetimepicker2").on("change.datetimepicker", function (e) {
+										$('#datetimepicker').datetimepicker('maxDate', e.date);
+									});
+								});
+							</script>
+				 </div>
+			</div>
+			
+				<div id="mostrar" style="float:left;"></div>
+
+		</aside>
+
+		<footer>
+			<section class="links">
+				<a href="index.html">Inicio</a>
+				<a href="#">Blog</a>
+				<a href="#">Proyectos</a>
+				<a href="#">Contacto</a>
+			</section>
+		</footer>
+	</div>
+	</body>
+</html>
